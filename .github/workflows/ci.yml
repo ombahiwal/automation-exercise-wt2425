@@ -35,13 +35,14 @@ jobs:
         run: pip install pytest coverage
       - name: Run Tests with Coverage
         run: |
-          pytest --cov=. --cov-report=term-missing
-          mv .coverage coverage-data/.coverage
+          coverage run -m pytest
+          coverage report -m
+          coverage html
       - name: Upload Coverage Artifact
         uses: actions/upload-artifact@v3
         with:
           name: coverage-data
-          path: coverage-data/
+          path: .coverage  # Corrected path for coverage file
           retention-days: 1
 
   coverage_report:
@@ -69,3 +70,22 @@ jobs:
           name: coverage-report
           path: coverage.xml
           retention-days: 14
+
+  update_readme_badge:
+    name: Update GitHub Workflow Badge in README.md
+    runs-on: ubuntu-latest
+    needs: coverage_report
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set up GitHub CLI
+        run: |
+          curl -fsSL https://cli.github.com/packages/githubcli-archive.key | sudo gpg --dearmor -o /usr/share/keyrings/github-archive-keyring.gpg
+          sudo apt-get update
+          sudo apt-get install gh
+      - name: Update README.md with Badge
+        run: |
+          gh repo edit --add-readme-file --body "
+          ![SSE CI/CD](https://github.com/<your-username>/<your-repo>/actions/workflows/ci.yml/badge.svg)"
+          git commit -am "Update README with CI/CD Badge"
+          git push
