@@ -41,6 +41,7 @@ jobs:
           coverage run -m pytest
           coverage report -m
           coverage html
+
       - name: Verify .coverage File
         run: ls -la .coverage  # Confirm the file exists
       - name: Upload Coverage Artifact
@@ -49,18 +50,6 @@ jobs:
           name: coverage-data
           path: .coverage  # Corrected path for coverage file
           retention-days: 1
-
-  coverage_report:
-    name: Generate Coverage Report
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-      - name: Install Coverage
-        run: pip install coverage
       - name: Generate Coverage Report
         run: |
           coverage report
@@ -75,7 +64,7 @@ jobs:
   update_readme_badge:
     name: Update GitHub Workflow Badge in README.md
     runs-on: ubuntu-latest
-    needs: coverage_report
+    needs: test
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
