@@ -62,20 +62,25 @@ jobs:
           retention-days: 14
 
   update_readme_badge:
-    name: Update GitHub Workflow Badge in README.md
+    name: Add CI/CD Badge to README
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Install GitHub CLI
+      - name: Update README.md with CI Badge
         run: |
-          sudo apt update
-          sudo apt install gh -y
-      - name: Update README.md with Badge
+          echo "![SSE CI/CD](https://github.com/${{ github.repository }}/actions/workflows/ci.yml/badge.svg)" > temp_readme
+          if [ -f README.md ]; then
+            grep -v '!\[SSE CI/CD\]' README.md >> temp_readme
+          fi
+          mv temp_readme README.md
+          cat README.md
+      - name: Commit and Push Changes
         run: |
-          gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
-          gh repo edit --add-readme-file --body "
-          ![SSE CI/CD](https://github.com/ombahiwal/automation-exercise-wt2425/actions/workflows/ci.yml/badge.svg)"
-          git commit -am "Update README with CI/CD Badge"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add README.md
+          git commit -m "Update README.md with CI Badge"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
