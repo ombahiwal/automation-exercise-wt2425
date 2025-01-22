@@ -41,6 +41,8 @@ jobs:
           coverage run -m pytest
           coverage report -m
           coverage html
+      - name: Verify .coverage File
+        run: ls -la .coverage  # Confirm the file exists
       - name: Upload Coverage Artifact
         uses: actions/upload-artifact@v3
         with:
