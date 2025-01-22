@@ -2,7 +2,7 @@
 Tests for functionality checks in class SolveDiffusion2D
 """
 
-from diffusion2d import SolveDiffusion2D
+from diffusion2d.diffusion2d import SolveDiffusion2D
 
 import numpy as np
 import unittest
