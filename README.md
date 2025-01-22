@@ -4,11 +4,9 @@ This repository contains some example Python code from the [Simulation Software 
 
 The code used in this exercise is based on [Chapter 7 of the book "Learning Scientific Programming with Python"](https://scipython.com/book/chapter-7-matplotlib/examples/the-two-dimensional-diffusion-equation/).
 
-
-# SSE CI/CD Workflow tasks
+# SSE CI/CD Workflow status
 
 ![SSE CI/CD](https://github.com/ombahiwal/automation-exercise-wt2425/actions/workflows/ci.yml/badge.svg)
-
 
 ## License
 
