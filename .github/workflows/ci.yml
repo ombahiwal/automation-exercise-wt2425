@@ -55,10 +55,6 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - name: Download Coverage Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: coverage-data
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
