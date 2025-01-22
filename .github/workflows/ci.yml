@@ -22,7 +22,7 @@ jobs:
         run: black --check .
 
   test:
-    name: Run Tests and Collect Coverage
+    name: Run Tests, Collect Coverage, Report
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -68,14 +68,14 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Set up GitHub CLI
+      - name: Install GitHub CLI
         run: |
-          curl -fsSL https://cli.github.com/packages/githubcli-archive.key | sudo gpg --dearmor -o /usr/share/keyrings/github-archive-keyring.gpg
-          sudo apt-get update
-          sudo apt-get install gh
+          sudo apt update
+          sudo apt install gh -y
       - name: Update README.md with Badge
         run: |
+          gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
           gh repo edit --add-readme-file --body "
-          ![SSE CI/CD](https://github.com/<your-username>/<your-repo>/actions/workflows/ci.yml/badge.svg)"
+          ![SSE CI/CD](https://github.com/ombahiwal/automation-exercise-wt2425/actions/workflows/ci.yml/badge.svg)"
           git commit -am "Update README with CI/CD Badge"
           git push
