@@ -1,0 +1,71 @@
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  style_check:
+    name: Check Code Style with Black
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install Dependencies
+        run: pip install black
+      - name: Run Black
+        run: black --check .
+
+  test:
+    name: Run Tests and Collect Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install Dependencies
+        run: pip install pytest coverage
+      - name: Run Tests with Coverage
+        run: |
+          pytest --cov=. --cov-report=term-missing
+          mv .coverage coverage-data/.coverage
+      - name: Upload Coverage Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-data
+          path: coverage-data/
+          retention-days: 1
+
+  coverage_report:
+    name: Generate Coverage Report
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Coverage Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage-data
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install Coverage
+        run: pip install coverage
+      - name: Generate Coverage Report
+        run: |
+          coverage report
+          coverage xml
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage.xml
+          retention-days: 14
