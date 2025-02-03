@@ -37,14 +37,14 @@ jobs:
           pip install numpy matplotlib
       - name: Run Tests with Coverage
         run: coverage run -m pytest
-      - name: Verify .coverage File
-        run: ls -la
+      - name: Verify .coverage File Exists
+        run: ls -la .coverage  # Debug: Ensure .coverage is generated
       - name: Upload Coverage Data
         uses: actions/upload-artifact@v4
         with:
           name: coverage-data
           path: .coverage
-          retention-days: 1
+          retention-days: 7  # Increased retention for testing purposes
 
   coverage_report:
     name: Generate and Upload Coverage Report
@@ -62,7 +62,7 @@ jobs:
         with:
           name: coverage-data
       - name: Verify Downloaded .coverage File
-        run: ls -la  # Verify artifact was downloaded correctly
+        run: ls -la  # Debug: Ensure artifact was downloaded
       - name: Generate Coverage Report
         run: |
           pip install coverage
