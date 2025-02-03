@@ -22,7 +22,7 @@ jobs:
         run: black --check .
 
   test:
-    name: Run Tests, Collect Coverage, Report
+    name: Run Tests and Generate Coverage Data
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -35,23 +35,37 @@ jobs:
         run: |
           pip install pytest coverage
           pip install numpy matplotlib
-
       - name: Run Tests with Coverage
-        run: |
-          coverage run -m pytest
-          coverage report -m
-          coverage html
-
+        run: coverage run -m pytest
       - name: Verify .coverage File
-        run: ls -la .coverage  # Confirm the file exists
-      - name: Upload Coverage Artifact
+        run: ls -la
+      - name: Upload Coverage Data
         uses: actions/upload-artifact@v3
         with:
           name: coverage-data
-          path: .coverage  # Corrected path for coverage file
+          path: .coverage
           retention-days: 1
+
+  coverage_report:
+    name: Generate and Upload Coverage Report
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Download Coverage Data
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage-data
+      - name: Verify Downloaded .coverage File
+        run: ls -la
       - name: Generate Coverage Report
         run: |
+          pip install coverage
           coverage report
           coverage xml
       - name: Upload Coverage Report
@@ -60,27 +74,3 @@ jobs:
           name: coverage-report
           path: coverage.xml
           retention-days: 14
-
-  update_readme_badge:
-    name: Add CI/CD Badge to README
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      - name: Update README.md with CI Badge
-        run: |
-          echo "![SSE CI/CD](https://github.com/${{ github.repository }}/actions/workflows/ci.yml/badge.svg)" > temp_readme
-          if [ -f README.md ]; then
-            grep -v '!\[SSE CI/CD\]' README.md >> temp_readme
-          fi
-          mv temp_readme README.md
-          cat README.md
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git add README.md
-          git commit -m "Update README.md with CI Badge"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
