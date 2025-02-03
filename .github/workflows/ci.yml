@@ -40,7 +40,7 @@ jobs:
       - name: Verify .coverage File
         run: ls -la
       - name: Upload Coverage Data
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-data
           path: .coverage
