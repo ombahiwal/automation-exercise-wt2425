@@ -57,20 +57,31 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
+      - name: Check if Artifact Exists
+        id: check_artifact
+        run: |
+          if ! gh api /repos/${{ github.repository }}/actions/artifacts --jq '.artifacts[] | select(.name == "coverage-data")' > /dev/null; then
+            echo "Artifact not found, skipping coverage report generation."
+            exit 0
+          fi
       - name: Download Coverage Data
         uses: actions/download-artifact@v4
         with:
           name: coverage-data
+        if: steps.check_artifact.outputs.artifact_exists == 'true'  # Only download if artifact exists
       - name: Verify Downloaded .coverage File
         run: ls -la  # Debug: Ensure artifact was downloaded
+        if: steps.check_artifact.outputs.artifact_exists == 'true'  # Only verify if artifact exists
       - name: Generate Coverage Report
         run: |
           pip install coverage
           coverage report
           coverage xml
+        if: steps.check_artifact.outputs.artifact_exists == 'true'  # Only run if artifact exists
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage.xml
           retention-days: 14
+        if: steps.check_artifact.outputs.artifact_exists == 'true'  # Only upload if artifact exists
